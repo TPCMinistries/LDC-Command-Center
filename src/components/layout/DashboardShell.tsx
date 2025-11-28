@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
+import { CommandPalette } from './CommandPalette'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { HelpWidget } from '@/components/chat/HelpWidget'
 import { InstallPrompt } from '@/components/pwa/InstallPrompt'
@@ -67,6 +68,11 @@ export function DashboardShell({
       {/* Help Widget */}
       {currentWorkspace && (
         <HelpWidget workspaceId={currentWorkspace.id} />
+      )}
+
+      {/* Command Palette */}
+      {currentWorkspace && (
+        <CommandPalette workspaceId={currentWorkspace.id} />
       )}
 
       {/* PWA Install Prompt */}
