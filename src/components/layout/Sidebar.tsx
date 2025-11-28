@@ -147,7 +147,7 @@ export function Sidebar({ workspaces, currentWorkspace: initialWorkspace }: Side
   }
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col">
+    <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col overflow-hidden">
       {/* Logo */}
       <div className="p-4 border-b border-zinc-800">
         <h1 className="text-xl font-bold text-amber-500">LDC Command</h1>
@@ -208,8 +208,8 @@ export function Sidebar({ workspaces, currentWorkspace: initialWorkspace }: Side
       )}
 
       {/* Navigation */}
-      <ScrollArea className="flex-1">
-        <nav className="p-2 space-y-0.5">
+      <ScrollArea className="flex-1 min-h-0">
+        <nav className="p-2 space-y-0.5 pb-4">
           {navItems.map((item) => {
             const href = `/workspace/${workspaceId}${item.href}`
             const isActive = pathname === href || pathname.startsWith(`${href}/`)
