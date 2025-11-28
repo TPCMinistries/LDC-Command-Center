@@ -14,6 +14,12 @@ import {
   Sparkles,
 } from 'lucide-react'
 import { format } from 'date-fns'
+import { UpcomingDeadlines } from '@/components/dashboard/UpcomingDeadlines'
+import { QuickStats } from '@/components/dashboard/QuickStats'
+import { RecentActivity } from '@/components/dashboard/RecentActivity'
+import { QuickActions } from '@/components/dashboard/QuickActions'
+import { CalendarWidget } from '@/components/google/CalendarWidget'
+import { EmailWidget } from '@/components/google/EmailWidget'
 
 interface TodayPageProps {
   params: Promise<{ workspaceId: string }>
@@ -76,6 +82,12 @@ export default async function TodayPage({ params }: TodayPageProps) {
         </p>
       </div>
 
+      {/* Quick Stats */}
+      <QuickStats workspaceId={workspaceId} />
+
+      {/* Quick Actions */}
+      <QuickActions workspaceId={workspaceId} />
+
       {/* Scripture of the Day */}
       <Card className="bg-gradient-to-br from-amber-900/20 to-zinc-900 border-amber-800/50">
         <CardHeader className="pb-2">
@@ -134,65 +146,11 @@ export default async function TodayPage({ params }: TodayPageProps) {
           </CardContent>
         </Card>
 
-        {/* Calendar Snapshot */}
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-zinc-100">
-              <Calendar className="h-5 w-5 text-blue-500" />
-              Today&apos;s Schedule
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {(briefing?.calendar_summary as Array<{ time: string; title: string; location?: string }> || [
-              { time: '9:00 AM', title: 'Morning devotional', location: 'Personal' },
-              { time: '10:30 AM', title: 'Institute strategy meeting', location: 'Zoom' },
-              { time: '2:00 PM', title: 'Donor call - Smith Foundation', location: 'Phone' },
-              { time: '4:00 PM', title: 'Uplift staff sync', location: 'Office' },
-            ]).map((event, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-4 p-3 rounded-lg bg-zinc-800/50"
-              >
-                <div className="text-sm font-medium text-blue-400 w-20">
-                  {event.time}
-                </div>
-                <div className="flex-1">
-                  <p className="text-zinc-100">{event.title}</p>
-                  {event.location && (
-                    <p className="text-xs text-zinc-500">{event.location}</p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+        {/* Google Calendar Widget */}
+        <CalendarWidget workspaceId={workspaceId} compact />
 
-        {/* Communications Summary */}
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-zinc-100">
-              <Mail className="h-5 w-5 text-green-500" />
-              Communications
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-zinc-400">Unread emails</span>
-                <Badge className="bg-green-600">12</Badge>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-zinc-400">Needs response</span>
-                <Badge variant="outline" className="border-amber-600 text-amber-500">3</Badge>
-              </div>
-              <Separator className="bg-zinc-800" />
-              <div className="text-sm text-zinc-500">
-                <p className="font-medium text-zinc-300 mb-1">Top priority:</p>
-                <p>Grant follow-up from NYC DYCD regarding Q4 reporting</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Google Email Widget */}
+        <EmailWidget workspaceId={workspaceId} compact />
 
         {/* Project Pulse */}
         <Card className="bg-zinc-900 border-zinc-800">
@@ -227,32 +185,11 @@ export default async function TodayPage({ params }: TodayPageProps) {
           </CardContent>
         </Card>
 
-        {/* RFP Alerts */}
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-zinc-100">
-              <FileText className="h-5 w-5 text-orange-500" />
-              RFP Radar
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="p-3 rounded-lg bg-orange-900/20 border border-orange-800/50">
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-orange-400 text-sm font-medium">Deadline Alert</p>
-                  <Badge className="bg-orange-600 text-xs">3 days</Badge>
-                </div>
-                <p className="text-zinc-100">NYC DYCD Workforce Innovation Grant</p>
-                <p className="text-xs text-zinc-500 mt-1">Est. value: $250,000</p>
-              </div>
-              <div className="p-3 rounded-lg bg-zinc-800/50">
-                <p className="text-zinc-400 text-sm">New opportunity</p>
-                <p className="text-zinc-100">DOL Youth Apprenticeship Program</p>
-                <p className="text-xs text-zinc-500 mt-1">Alignment score: 87%</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* RFP Alerts - Dynamic Deadlines */}
+        <UpcomingDeadlines workspaceId={workspaceId} />
+
+        {/* Recent Activity */}
+        <RecentActivity workspaceId={workspaceId} />
 
         {/* Ministry Corner */}
         <Card className="bg-zinc-900 border-zinc-800">

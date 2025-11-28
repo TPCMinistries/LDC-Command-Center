@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
-import { Sidebar } from '@/components/layout/Sidebar'
-import { Header } from '@/components/layout/Header'
+import { DashboardShell } from '@/components/layout/DashboardShell'
 
 export default async function DashboardLayout({
   children,
@@ -9,6 +9,8 @@ export default async function DashboardLayout({
   children: React.ReactNode
 }) {
   const supabase = await createClient()
+  const headersList = await headers()
+  const pathname = headersList.get('x-pathname') || headersList.get('x-invoke-path') || ''
 
   const {
     data: { user },
@@ -18,11 +20,21 @@ export default async function DashboardLayout({
     redirect('/login')
   }
 
-  // Fetch user's workspaces
+  // Fetch user's workspaces with settings
   const { data: workspaces } = await supabase
     .from('workspaces')
-    .select('id, name, slug, type')
+    .select('id, name, slug, type, settings')
+    .order('type', { ascending: true }) // personal first
     .order('created_at', { ascending: true })
+
+  // Try to extract current workspace ID from URL
+  const workspaceMatch = pathname.match(/\/workspace\/([^\/]+)/)
+  const currentWorkspaceId = workspaceMatch ? workspaceMatch[1] : null
+
+  // Find current workspace or default to first
+  const currentWorkspace = currentWorkspaceId
+    ? workspaces?.find(w => w.id === currentWorkspaceId) || workspaces?.[0] || null
+    : workspaces?.[0] || null
 
   // Fetch user profile
   const { data: profile } = await supabase
@@ -38,16 +50,36 @@ export default async function DashboardLayout({
     avatar_url: profile?.avatar_url,
   }
 
+  // Cast workspaces to include settings type
+  const typedWorkspaces = (workspaces || []).map(ws => ({
+    ...ws,
+    settings: ws.settings as { modules?: string[] } | undefined
+  })) as Array<{
+    id: string
+    name: string
+    slug: string
+    type: 'personal' | 'organization'
+    settings?: { modules?: string[] }
+  }>
+
+  const typedCurrentWorkspace = currentWorkspace ? {
+    ...currentWorkspace,
+    settings: currentWorkspace.settings as { modules?: string[] } | undefined
+  } as {
+    id: string
+    name: string
+    slug: string
+    type: 'personal' | 'organization'
+    settings?: { modules?: string[] }
+  } : null
+
   return (
-    <div className="min-h-screen bg-zinc-950">
-      <Sidebar
-        workspaces={workspaces || []}
-        currentWorkspace={workspaces?.[0] || null}
-      />
-      <div className="pl-64">
-        <Header user={userInfo} />
-        <main className="p-6">{children}</main>
-      </div>
-    </div>
+    <DashboardShell
+      workspaces={typedWorkspaces}
+      currentWorkspace={typedCurrentWorkspace}
+      user={userInfo}
+    >
+      {children}
+    </DashboardShell>
   )
 }

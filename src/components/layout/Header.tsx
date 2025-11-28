@@ -2,9 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Bell, Search, LogOut, User, Settings } from 'lucide-react'
+import { LogOut, User, Settings, Menu } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -13,6 +12,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { CommandPalette } from '@/components/search/CommandPalette'
+import { NotificationDropdown } from '@/components/notifications/NotificationDropdown'
 
 interface HeaderProps {
   user: {
@@ -21,9 +22,11 @@ interface HeaderProps {
     full_name?: string
     avatar_url?: string
   } | null
+  workspaceId?: string
+  onMobileMenuToggle?: () => void
 }
 
-export function Header({ user }: HeaderProps) {
+export function Header({ user, workspaceId, onMobileMenuToggle }: HeaderProps) {
   const router = useRouter()
   const supabase = createClient()
 
@@ -40,28 +43,30 @@ export function Header({ user }: HeaderProps) {
     .toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'
 
   return (
-    <header className="h-16 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between px-6">
+    <header className="h-16 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between px-4 md:px-6">
+      {/* Mobile menu toggle */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="md:hidden text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 mr-2"
+        onClick={onMobileMenuToggle}
+      >
+        <Menu className="h-5 w-5" />
+      </Button>
+
       {/* Search */}
       <div className="flex-1 max-w-md">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-          <Input
-            placeholder="Search across everything..."
-            className="pl-10 bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-amber-500"
-          />
-        </div>
+        {workspaceId ? (
+          <CommandPalette workspaceId={workspaceId} />
+        ) : (
+          <div className="text-sm text-zinc-500">Select a workspace</div>
+        )}
       </div>
 
       {/* Right side */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 md:gap-4">
         {/* Notifications */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800"
-        >
-          <Bell className="h-5 w-5" />
-        </Button>
+        {workspaceId && <NotificationDropdown workspaceId={workspaceId} />}
 
         {/* User menu */}
         <DropdownMenu>
