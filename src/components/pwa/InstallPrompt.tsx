@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { Download, X, Smartphone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { motion, AnimatePresence } from 'framer-motion'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -78,82 +77,66 @@ export function InstallPrompt() {
   if (!showPrompt) return null
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 50 }}
-        className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-80 z-50"
-      >
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl p-4">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-lg bg-amber-600/20 flex items-center justify-center flex-shrink-0">
-              <Smartphone className="w-5 h-5 text-amber-500" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-white text-sm">Install LDC Command</h3>
-              <p className="text-xs text-zinc-400 mt-1">
-                Add to your home screen for quick access and offline support.
-              </p>
-            </div>
-            <button
-              onClick={handleDismiss}
-              className="text-zinc-500 hover:text-zinc-300 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
+    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-80 z-50 animate-in slide-in-from-bottom-4 fade-in duration-300">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl p-4">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-lg bg-amber-600/20 flex items-center justify-center flex-shrink-0">
+            <Smartphone className="w-5 h-5 text-amber-500" />
           </div>
-
-          {isIOS ? (
-            <div className="mt-3">
-              <Button
-                onClick={() => setShowIOSInstructions(!showIOSInstructions)}
-                variant="outline"
-                size="sm"
-                className="w-full border-amber-600/50 text-amber-500 hover:bg-amber-600/10"
-              >
-                Show Instructions
-              </Button>
-
-              <AnimatePresence>
-                {showIOSInstructions && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="mt-3 p-3 bg-zinc-800/50 rounded-lg text-xs text-zinc-300 space-y-2">
-                      <p>1. Tap the <strong>Share</strong> button in Safari</p>
-                      <p>2. Scroll down and tap <strong>"Add to Home Screen"</strong></p>
-                      <p>3. Tap <strong>"Add"</strong> to confirm</p>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          ) : (
-            <div className="mt-3 flex gap-2">
-              <Button
-                onClick={handleDismiss}
-                variant="ghost"
-                size="sm"
-                className="flex-1 text-zinc-400"
-              >
-                Not Now
-              </Button>
-              <Button
-                onClick={handleInstall}
-                size="sm"
-                className="flex-1 bg-amber-600 hover:bg-amber-700"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Install
-              </Button>
-            </div>
-          )}
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-white text-sm">Install LDC Command</h3>
+            <p className="text-xs text-zinc-400 mt-1">
+              Add to your home screen for quick access and offline support.
+            </p>
+          </div>
+          <button
+            onClick={handleDismiss}
+            className="text-zinc-500 hover:text-zinc-300 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
-      </motion.div>
-    </AnimatePresence>
+
+        {isIOS ? (
+          <div className="mt-3">
+            <Button
+              onClick={() => setShowIOSInstructions(!showIOSInstructions)}
+              variant="outline"
+              size="sm"
+              className="w-full border-amber-600/50 text-amber-500 hover:bg-amber-600/10"
+            >
+              Show Instructions
+            </Button>
+
+            {showIOSInstructions && (
+              <div className="mt-3 p-3 bg-zinc-800/50 rounded-lg text-xs text-zinc-300 space-y-2 animate-in fade-in duration-200">
+                <p>1. Tap the <strong>Share</strong> button in Safari</p>
+                <p>2. Scroll down and tap <strong>&quot;Add to Home Screen&quot;</strong></p>
+                <p>3. Tap <strong>&quot;Add&quot;</strong> to confirm</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="mt-3 flex gap-2">
+            <Button
+              onClick={handleDismiss}
+              variant="ghost"
+              size="sm"
+              className="flex-1 text-zinc-400"
+            >
+              Not Now
+            </Button>
+            <Button
+              onClick={handleInstall}
+              size="sm"
+              className="flex-1 bg-amber-600 hover:bg-amber-700"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Install
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
