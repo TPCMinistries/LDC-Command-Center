@@ -305,7 +305,8 @@ export function HelpWidget({ workspaceId }: HelpWidgetProps) {
       )}
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-3">
+      <ScrollArea className="flex-1 overflow-hidden">
+        <div className="p-3">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-zinc-500">
             <MessageSquare className="h-10 w-10 mb-3 opacity-50" />
@@ -344,13 +345,13 @@ export function HelpWidget({ workspaceId }: HelpWidgetProps) {
                   </div>
                 )}
                 <div
-                  className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
+                  className={`max-w-[85%] rounded-lg px-3 py-2 text-sm overflow-hidden ${
                     message.role === 'user'
                       ? 'bg-amber-600/20 text-zinc-100'
                       : 'bg-zinc-800 text-zinc-200'
                   }`}
                 >
-                  <div className="prose prose-invert prose-sm max-w-none">
+                  <div className="prose prose-invert prose-sm max-w-none break-words [&>*]:break-words [&_p]:break-words">
                     <ReactMarkdown>{message.content}</ReactMarkdown>
                   </div>
                 </div>
@@ -374,6 +375,7 @@ export function HelpWidget({ workspaceId }: HelpWidgetProps) {
             <div ref={messagesEndRef} />
           </div>
         )}
+        </div>
       </ScrollArea>
 
       {/* Input */}

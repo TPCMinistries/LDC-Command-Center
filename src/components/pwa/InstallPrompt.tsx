@@ -16,8 +16,12 @@ export function InstallPrompt() {
   const [showIOSInstructions, setShowIOSInstructions] = useState(false)
 
   useEffect(() => {
-    // Check if already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    // Check if already installed (multiple methods)
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    const isIOSStandalone = (window.navigator as Navigator & { standalone?: boolean }).standalone === true
+    const wasInstalled = localStorage.getItem('pwa-installed') === 'true'
+
+    if (isStandalone || isIOSStandalone || wasInstalled) {
       return
     }
 
@@ -25,8 +29,8 @@ export function InstallPrompt() {
     const dismissed = localStorage.getItem('pwa-install-dismissed')
     if (dismissed) {
       const dismissedTime = parseInt(dismissed)
-      // Show again after 7 days
-      if (Date.now() - dismissedTime < 7 * 24 * 60 * 60 * 1000) {
+      // Show again after 30 days (increased from 7)
+      if (Date.now() - dismissedTime < 30 * 24 * 60 * 60 * 1000) {
         return
       }
     }
@@ -64,6 +68,8 @@ export function InstallPrompt() {
 
     if (outcome === 'accepted') {
       setShowPrompt(false)
+      // Remember that user installed the app
+      localStorage.setItem('pwa-installed', 'true')
     }
 
     setDeferredPrompt(null)
