@@ -21,11 +21,20 @@ export default async function DashboardLayout({
   }
 
   // Fetch user's workspaces with settings
-  const { data: workspaces } = await supabase
+  const { data: workspacesData } = await supabase
     .from('workspaces')
     .select('id, name, slug, type, settings')
     .order('type', { ascending: true }) // personal first
     .order('created_at', { ascending: true })
+
+  // Type the workspaces properly
+  const workspaces = (workspacesData || []) as Array<{
+    id: string
+    name: string
+    slug: string
+    type: 'personal' | 'organization'
+    settings?: { modules?: string[] }
+  }>
 
   // Try to extract current workspace ID from URL
   const workspaceMatch = pathname.match(/\/workspace\/([^\/]+)/)
@@ -33,8 +42,8 @@ export default async function DashboardLayout({
 
   // Find current workspace or default to first
   const currentWorkspace = currentWorkspaceId
-    ? workspaces?.find(w => w.id === currentWorkspaceId) || workspaces?.[0] || null
-    : workspaces?.[0] || null
+    ? workspaces.find(w => w.id === currentWorkspaceId) || workspaces[0] || null
+    : workspaces[0] || null
 
   // Fetch user profile
   const { data: profile } = await supabase
@@ -50,33 +59,10 @@ export default async function DashboardLayout({
     avatar_url: profile?.avatar_url,
   }
 
-  // Cast workspaces to include settings type
-  const typedWorkspaces = (workspaces || []).map(ws => ({
-    ...ws,
-    settings: ws.settings as { modules?: string[] } | undefined
-  })) as Array<{
-    id: string
-    name: string
-    slug: string
-    type: 'personal' | 'organization'
-    settings?: { modules?: string[] }
-  }>
-
-  const typedCurrentWorkspace = currentWorkspace ? {
-    ...currentWorkspace,
-    settings: currentWorkspace.settings as { modules?: string[] } | undefined
-  } as {
-    id: string
-    name: string
-    slug: string
-    type: 'personal' | 'organization'
-    settings?: { modules?: string[] }
-  } : null
-
   return (
     <DashboardShell
-      workspaces={typedWorkspaces}
-      currentWorkspace={typedCurrentWorkspace}
+      workspaces={workspaces}
+      currentWorkspace={currentWorkspace}
       user={userInfo}
     >
       {children}
