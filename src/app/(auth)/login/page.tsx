@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,10 +15,15 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
-  const supabase = createClient()
+  // Lazy initialize Supabase client only on client-side
+  const supabase = useMemo(() => {
+    if (typeof window === 'undefined') return null
+    return createClient()
+  }, [])
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!supabase) return
     setLoading(true)
     setMessage(null)
 
@@ -37,6 +42,7 @@ export default function LoginPage() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!supabase) return
     setLoading(true)
     setMessage(null)
 
@@ -61,6 +67,7 @@ export default function LoginPage() {
 
   const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!supabase) return
     setLoading(true)
     setMessage(null)
 
